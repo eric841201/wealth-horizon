@@ -1,12 +1,9 @@
 /**
- * WEALTH HORIZON - Service Worker (純本地離線快取引擎 V4)
- * 動態適配 GitHub Pages 子路徑，提供 100% 離線秒開導航保底
+ * WEALTH HORIZON - Service Worker (純本地離線快取引擎 V5)
+ * 絕對 URL 精確匹配，完全隔離 iOS 飛航模式的網絡報錯
  */
 
-const CACHE_NAME = 'wealth-horizon-v4';
-
-// 自動獲取當前 SW 所在基礎路徑 (例如 '/wealth-horizon/')
-const BASE_PATH = location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1);
+const CACHE_NAME = 'wealth-horizon-v5';
 
 const ASSET_FILES = [
     '',
@@ -26,22 +23,33 @@ const ASSET_FILES = [
     'vendor/confetti/confetti.browser.min.js'
 ];
 
-const FULL_ASSET_URLS = ASSET_FILES.map(file => BASE_PATH + file);
-
-// 安裝並預快取所有靜態資源
+// 安裝並寫入快取
 self.addEventListener('install', (event) => {
     self.skipWaiting();
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            console.log('[SW V4] Caching assets for base path:', BASE_PATH);
-            return cache.addAll(FULL_ASSET_URLS);
-        }).catch((err) => {
-            console.error('[SW V4] Cache addAll error:', err);
+        caches.open(CACHE_NAME).then(async (cache) => {
+            const scope = self.registration.scope;
+            console.log('[SW V5] Initializing cache with scope:', scope);
+            
+            // 將所有相對路徑轉換為完整絕對 URL
+            const fullUrls = ASSET_FILES.map(file => new URL(file, scope).href);
+            
+            // 逐一抓取快取，確保每個都成功
+            await Promise.all(
+                fullUrls.map(url => {
+                    return fetch(url, { cache: 'no-cache' }).then(res => {
+                        if (res.status === 200) {
+                            return cache.put(url, res);
+                        }
+                    }).catch(e => console.warn('[SW V5] Cache single fail:', url, e));
+                })
+            );
+            console.log('[SW V5] All local assets cached successfully.');
         })
     );
 });
 
-// 啟動並清理舊版本快取
+// 啟動並接管
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         Promise.all([
@@ -49,54 +57,74 @@ self.addEventListener('activate', (event) => {
                 return Promise.all(
                     keys.map((key) => {
                         if (key !== CACHE_NAME) {
-                            console.log('[SW V4] Deleting old cache:', key);
+                            console.log('[SW V5] Deleting old cache:', key);
                             return caches.delete(key);
                         }
                     })
                 );
             }),
             self.clients.claim()
-        ])
+        ]).then(() => {
+            // 通知所有已打開的頁面離線已就緒
+            self.clients.matchAll().then(clients => {
+                clients.forEach(c => c.postMessage('OFFLINE_READY'));
+            });
+        })
     );
 });
 
-// 離線請求攔截 (Cache-First + 絕對導航保底)
+// 離線請求攔截
 self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
 
-    const url = new URL(event.request.url);
+    const reqUrl = event.request.url;
     const isNavigation = event.request.mode === 'navigate' || 
                          event.request.destination === 'document' || 
                          event.request.headers.get('accept')?.includes('text/html');
 
+    // 1. 導航請求 (點開 App / 重開 App) - 絕對快取第一，絕不讓 iOS 嘗試網絡報錯
+    if (isNavigation) {
+        event.respondWith(
+            caches.open(CACHE_NAME).then(async (cache) => {
+                const scope = self.registration.scope;
+                const indexUrl = new URL('index.html', scope).href;
+                
+                // 優先比對
+                let cached = await cache.match(event.request, { ignoreSearch: true });
+                if (cached) return cached;
+
+                cached = await cache.match(indexUrl, { ignoreSearch: true });
+                if (cached) return cached;
+
+                cached = await cache.match(scope, { ignoreSearch: true });
+                if (cached) return cached;
+
+                // 真的沒有才嘗試網絡
+                return fetch(event.request);
+            }).catch(() => {
+                // 完全斷網時的終極保底
+                return caches.match(new URL('index.html', self.registration.scope).href);
+            })
+        );
+        return;
+    }
+
+    // 2. 靜態資源請求 (CSS / JS / 字體 / 圖標)
     event.respondWith(
         caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
             if (cachedResponse) {
                 return cachedResponse;
             }
 
-            // 導航請求若未直接命中，以 index.html 保底
-            if (isNavigation) {
-                return caches.match(BASE_PATH + 'index.html').then((fallback) => {
-                    return fallback || caches.match(BASE_PATH) || fetch(event.request);
-                });
-            }
-
             return fetch(event.request).then((networkResponse) => {
-                if (!networkResponse || networkResponse.status !== 200) {
-                    return networkResponse;
+                if (networkResponse && networkResponse.status === 200) {
+                    const responseClone = networkResponse.clone();
+                    caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(event.request, responseClone);
+                    });
                 }
-                const responseClone = networkResponse.clone();
-                caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(event.request, responseClone);
-                });
                 return networkResponse;
             });
-        }).catch(() => {
-            // 斷網離線保底
-            if (isNavigation) {
-                return caches.match(BASE_PATH + 'index.html') || caches.match(BASE_PATH);
-            }
         })
     );
 });

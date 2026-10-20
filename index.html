@@ -641,13 +641,42 @@
     <!-- Application Logic -->
     <script src="js/app.js"></script>
 
+    <!-- 離線就緒狀態提示框 -->
+    <div id="offlineReadyBadge" class="position-fixed top-0 start-50 translate-middle-x mt-3 alert alert-success py-2 px-3 rounded-pill shadow-lg small fw-bold d-none" style="z-index: 9999; background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; border: 1px solid rgba(255,255,255,0.3); font-size: 0.82rem;">
+        <i class="bi bi-check-circle-fill me-1"></i> 離線 App 已完成存檔！隨時可關閉網路使用
+    </div>
+
     <!-- PWA Service Worker Registration -->
     <script>
+        function triggerOfflineReadyUI() {
+            const badge = document.getElementById('offlineReadyBadge');
+            if (badge && badge.classList.contains('d-none')) {
+                badge.classList.remove('d-none');
+                setTimeout(() => { badge.classList.add('d-none'); }, 6000);
+            }
+        }
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
-                    .then((reg) => console.log('PWA ServiceWorker registered successfully:', reg.scope))
+                    .then(async (reg) => {
+                        console.log('PWA ServiceWorker registered:', reg.scope);
+                        // 檢查快取狀態
+                        if ('caches' in window) {
+                            const cache = await caches.open('wealth-horizon-v5');
+                            const keys = await cache.keys();
+                            if (keys.length >= 10) {
+                                triggerOfflineReadyUI();
+                            }
+                        }
+                    })
                     .catch((err) => console.warn('PWA ServiceWorker registration failed:', err));
+            });
+
+            navigator.serviceWorker.addEventListener('message', (event) => {
+                if (event.data === 'OFFLINE_READY') {
+                    triggerOfflineReadyUI();
+                }
             });
         }
     </script>
