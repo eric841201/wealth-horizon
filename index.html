@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-TW" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>財富推進器 | 100萬與1000萬資產里程碑管理系統</title>
+    <meta name="description" content="專為第一桶金與千萬自由打造的動態分流存錢與資產推進系統，支援高利活存與0050自動溢流、調薪未來推演與複利模擬。">
+    
+    <!-- PWA Manifest & Mobile Standalone Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0e17">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="財富推進器">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+
+    <!-- Google Fonts: Outfit & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5.2.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Chart.js & Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+</head>
+<body class="bg-main text-light min-vh-100 d-flex flex-column">
+
+    <!-- 全局頂部導航 -->
+    <header class="navbar navbar-expand-lg glass-nav sticky-top px-3 py-2 border-bottom border-secondary-subtle">
+        <div class="container-fluid max-w-1200">
+            <div class="d-flex align-items-center gap-2">
+                <div class="brand-icon-wrapper">
+                    <i class="bi bi-rocket-takeoff-fill text-gold fs-4"></i>
+                </div>
+                <div>
+                    <h1 class="h6 mb-0 fw-bold tracking-wide brand-title">WEALTH HORIZON</h1>
+                    <span class="badge bg-gold-subtle text-gold xsmall-badge">第一桶金 ➔ 千萬自由</span>
+                </div>
+            </div>
+            
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-outline-light btn-sm rounded-pill px-3 py-1 d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#settingsModal" id="btnOpenSettings">
+                    <i class="bi bi-gear-fill"></i>
+                    <span class="d-none d-sm-inline">策略參數</span>
+                </button>
+                <button type="button" class="btn btn-gold btn-sm rounded-pill px-3 py-1 fw-bold shadow-gold d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#depositModal" id="btnQuickDeposit">
+                    <i class="bi bi-plus-circle-fill"></i>
+                    <span>入帳打卡</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要內容區 -->
+    <main class="flex-grow-1 container-fluid max-w-1200 py-4 px-3 px-md-4">
+
+        <!-- 頂部：核心資產總覽與雙目標切換 -->
+        <section class="row g-3 mb-4">
+            <!-- 總資產成就卡 -->
+            <div class="col-12 col-lg-7">
+                <div class="card glass-card h-100 p-4 border-0 position-relative overflow-hidden">
+                    <div class="card-glow-bg"></div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-secondary small fw-medium tracking-wide">目前已累積總資產 (NET WORTH)</span>
+                        <div class="btn-group btn-group-sm p-1 bg-dark-subtle rounded-pill border border-secondary" role="group">
+                            <input type="radio" class="btn-check" name="targetGoalToggle" id="goal1M" value="1000000" checked autocomplete="off">
+                            <label class="btn btn-sm rounded-pill px-3 py-1 goal-toggle-btn" for="goal1M">100 萬 (第一桶金)</label>
+                            
+                            <input type="radio" class="btn-check" name="targetGoalToggle" id="goal10M" value="10000000" autocomplete="off">
+                            <label class="btn btn-sm rounded-pill px-3 py-1 goal-toggle-btn" for="goal10M">1000 萬 (財務自由)</label>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap align-items-baseline gap-2 mb-2">
+                        <span class="currency-symbol text-gold fw-bold display-6">NT$</span>
+                        <span class="display-4 fw-extrabold text-white tracking-tight" id="displayTotalNetWorth">0</span>
+                        <span class="badge bg-success-subtle text-success ms-2 align-self-center py-2 px-3 rounded-pill" id="badgeProfitRate">
+                            <i class="bi bi-graph-up-arrow me-1"></i> 市值增益 +0%
+                        </span>
+                    </div>
+
+                    <!-- 進度條 -->
+                    <div class="my-3">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span class="text-secondary" id="labelCurrentMilestoneGoal">距離 100 萬目標進度</span>
+                            <span class="fw-bold text-gold" id="textGoalPercent">0.00%</span>
+                        </div>
+                        <div class="progress progress-glass" style="height: 14px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-gradient-gold" id="progressBarGoal" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+
+                    <!-- 統計資訊卡片列 -->
+                    <div class="row g-2 pt-2 border-top border-secondary-subtle">
+                        <div class="col-6 col-sm-4">
+                            <div class="stat-box">
+                                <span class="stat-label">累積投入本金</span>
+                                <span class="stat-value text-light" id="statTotalPrincipal">NT$ 0</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-sm-4">
+                            <div class="stat-box">
+                                <span class="stat-label">0050 未實現損益</span>
+                                <span class="stat-value text-success" id="statUnrealizedProfit">NT$ 0</span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-4">
+                            <div class="stat-box">
+                                <span class="stat-label">預計達標日期 (動態演算)</span>
+                                <span class="stat-value text-gold fw-bold" id="statEstimatedDate">計算中...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 目標倒數與推進快報 -->
+            <div class="col-12 col-lg-5">
+                <div class="card glass-card h-100 p-4 border-0 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h2 class="h6 text-secondary mb-0 fw-bold"><i class="bi bi-compass text-gold me-2"></i>推進動能指針</h2>
+                            <span class="badge bg-secondary-subtle text-secondary rounded-pill" id="badgeActiveRate">每月存 NT$ 30,000</span>
+                        </div>
+                        <div class="countdown-hero py-2">
+                            <div class="text-secondary small">距離達成目標剩餘</div>
+                            <div class="d-flex align-items-baseline gap-1 my-1">
+                                <span class="display-5 fw-extrabold text-gold" id="countdownMonths">--</span>
+                                <span class="text-secondary fw-semibold">個月</span>
+                                <span class="text-muted small ms-2">(約 <span id="countdownDays">--</span> 天)</span>
+                            </div>
+                            <p class="text-secondary small mb-0" id="textEncouragement">
+                                穩紮穩打！建立安全池後，0050 的複利滾輪即將加速轉動。
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 快速動作列 -->
+                    <div class="row g-2 mt-3 pt-3 border-top border-secondary-subtle">
+                        <div class="col-6">
+                            <button class="btn btn-outline-gold w-100 py-2 btn-sm rounded-3 fw-semibold" id="btnRegularDepositQuick">
+                                <i class="bi bi-calendar-check me-1"></i> 每月例行打卡
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-outline-info w-100 py-2 btn-sm rounded-3 fw-semibold" data-bs-toggle="modal" data-bs-target="#recalibrateModal">
+                                <i class="bi bi-arrow-repeat me-1"></i> 市值/配息校準
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 核心亮點：雙水庫動態水位槽 -->
+        <section class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h2 class="h5 fw-bold mb-0 text-white d-flex align-items-center gap-2">
+                        <i class="bi bi-layers-half text-gold"></i> 雙水庫動態分流系統
+                    </h2>
+                    <span class="text-secondary small">高利活存未達標前優先填滿，一旦滿水位全額自動溢流至 0050 ETF</span>
+                </div>
+                <div class="text-end d-none d-sm-block">
+                    <span class="badge bg-dark-subtle border border-secondary text-secondary">
+                        <i class="bi bi-shield-lock-fill text-warning me-1"></i>活存目標：NT$ <span id="labelEmergencyCap">120,000</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <!-- 水庫 A：高利活存（防禦池） -->
+                <div class="col-12 col-md-6">
+                    <div class="card glass-card p-4 border-0 reservoir-card position-relative overflow-hidden" id="cardEmergencyPool">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="reservoir-badge bg-primary-subtle text-primary">
+                                        <i class="bi bi-shield-shaded"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="h6 fw-bold mb-0 text-white">高利活存防禦池</h3>
+                                        <span class="text-secondary xsmall">緊急預備金 / 每月撥款上限 NT$ 15,000</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge rounded-pill" id="badgeEmergencyStatus">充能蓄水中</span>
+                            </div>
+                        </div>
+
+                        <!-- 水位動態視覺 -->
+                        <div class="reservoir-liquid-wrapper my-2">
+                            <div class="liquid-box liquid-blue">
+                                <div class="liquid-wave" id="waveEmergency" style="height: 0%;"></div>
+                                <div class="liquid-overlay d-flex flex-column align-items-center justify-content-center">
+                                    <div class="liquid-percent fw-extrabold display-6 text-white" id="textEmergencyPercent">0%</div>
+                                    <div class="liquid-amt small text-white-50" id="textEmergencyAmount">NT$ 0 / 120,000</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top border-secondary-subtle small">
+                            <span class="text-secondary">剩餘缺口：<span class="text-warning fw-semibold" id="textEmergencyDeficit">NT$ 120,000</span></span>
+                            <span class="text-secondary" id="textEmergencyMonthsLeft">約需 8 個月滿額</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 水庫 B：0050 ETF（進攻池） -->
+                <div class="col-12 col-md-6">
+                    <div class="card glass-card p-4 border-0 reservoir-card position-relative overflow-hidden" id="cardEtfPool">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="reservoir-badge bg-emerald-subtle text-emerald">
+                                        <i class="bi bi-graph-up-arrow"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="h6 fw-bold mb-0 text-white">0050 ETF 進攻成長池</h3>
+                                        <span class="text-secondary xsmall">資產爆發滾存 / 複利增長核心引擎</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-emerald-subtle text-emerald rounded-pill" id="badgeEtfMode">溢流推進中</span>
+                            </div>
+                        </div>
+
+                        <!-- 水位動態視覺 -->
+                        <div class="reservoir-liquid-wrapper my-2">
+                            <div class="liquid-box liquid-emerald">
+                                <div class="liquid-wave" id="waveEtf" style="height: 0%;"></div>
+                                <div class="liquid-overlay d-flex flex-column align-items-center justify-content-center">
+                                    <div class="liquid-percent fw-extrabold display-6 text-white" id="textEtfPercent">0%</div>
+                                    <div class="liquid-amt small text-white-50" id="textEtfCurrent">市值 NT$ 0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top border-secondary-subtle small">
+                            <span class="text-secondary">累積本金：<span class="text-light fw-semibold" id="textEtfPrincipal">NT$ 0</span></span>
+                            <span class="text-emerald" id="textEtfRatePreview">預期年化 7.0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RPG 里程碑進度大地圖 -->
+        <section class="card glass-card p-4 border-0 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="h5 fw-bold mb-0 text-white d-flex align-items-center gap-2">
+                        <i class="bi bi-map-fill text-gold"></i> 財富航道里程碑 (ROADMAP)
+                    </h2>
+                    <span class="text-secondary small">每一個階段都是一場勝利，解鎖專屬防禦與進攻徽章</span>
+                </div>
+            </div>
+
+            <!-- 里程碑節點軌道 -->
+            <div class="milestones-track-wrapper">
+                <div class="milestones-track" id="milestonesTrack">
+                    <!-- 動態生成節點 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 圖表分析與沙盤推演 -->
+        <section class="row g-3 mb-4">
+            <!-- 走勢預測圖 -->
+            <div class="col-12 col-lg-8">
+                <div class="card glass-card p-4 border-0 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h2 class="h6 fw-bold mb-0 text-white d-flex align-items-center gap-2">
+                                <i class="bi bi-bezier2 text-gold"></i> 未來資產成長複利軌跡 (30年沙盤)
+                            </h2>
+                            <span class="text-secondary xsmall">含本金累積線 vs 0050 複利成長線對比</span>
+                        </div>
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-outline-secondary active btn-chart-range" data-years="5">5年</button>
+                            <button type="button" class="btn btn-outline-secondary btn-chart-range" data-years="10">10年</button>
+                            <button type="button" class="btn btn-outline-secondary btn-chart-range" data-years="20">20年</button>
+                        </div>
+                    </div>
+                    <div class="chart-container" style="position: relative; height: 280px; width: 100%;">
+                        <canvas id="projectionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 調薪加碼沙盤模擬器 (What-If) -->
+            <div class="col-12 col-lg-4">
+                <div class="card glass-card p-4 border-0 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <h2 class="h6 fw-bold mb-1 text-white d-flex align-items-center gap-2">
+                            <i class="bi bi-sliders2 text-gold"></i> 調薪沙盤快速試算
+                        </h2>
+                        <span class="text-secondary xsmall mb-3 d-block">拖動滑桿，立即看見調薪對 1000 萬的加速效應</span>
+
+                        <!-- 每月投入試算滑桿 -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span class="text-secondary">假設未來每月存入</span>
+                                <span class="text-gold fw-bold" id="sliderDepositVal">NT$ 30,000</span>
+                            </div>
+                            <input type="range" class="form-range" id="sliderDeposit" min="10000" max="100000" step="1000" value="30000">
+                        </div>
+
+                        <!-- 預期年化報酬率滑桿 -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span class="text-secondary">0050 年化報酬率</span>
+                                <span class="text-emerald fw-bold" id="sliderRateVal">7.0 %</span>
+                            </div>
+                            <input type="range" class="form-range" id="sliderRate" min="3" max="12" step="0.5" value="7.0">
+                        </div>
+                    </div>
+
+                    <div class="simulation-result p-3 rounded-3 bg-dark-subtle border border-secondary-subtle">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="xsmall text-secondary">試算達標 100 萬</span>
+                            <span class="small fw-bold text-light" id="simResult1M">-- 年 -- 個月</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="xsmall text-secondary">試算達標 1000 萬</span>
+                            <span class="small fw-bold text-gold" id="simResult10M">-- 年 -- 個月</span>
+                        </div>
+                        <button type="button" class="btn btn-outline-gold btn-sm w-100 mt-2 py-1" id="btnApplySimulation">
+                            套用為正式策略設定
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 歷史存錢流水帳 (支援刪除、撤銷、補登) -->
+        <section class="card glass-card p-4 border-0 mb-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <div>
+                    <h2 class="h5 fw-bold mb-0 text-white d-flex align-items-center gap-2">
+                        <i class="bi bi-clock-history text-gold"></i> 存錢時光日誌 (流水帳明細)
+                    </h2>
+                    <span class="text-secondary small">真實記錄每一筆入帳的分流情況，支援編輯與刪除防呆</span>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-secondary btn-sm" id="btnExportData">
+                        <i class="bi bi-download me-1"></i>匯出備份
+                    </button>
+                    <label class="btn btn-outline-secondary btn-sm mb-0">
+                        <i class="bi bi-upload me-1"></i>匯入還原
+                        <input type="file" id="importFileInput" accept=".json" class="d-none">
+                    </label>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0 custom-table">
+                    <thead>
+                        <tr class="text-secondary small">
+                            <th>入帳日期</th>
+                            <th>交易類型</th>
+                            <th class="text-end">總入帳金額</th>
+                            <th class="text-end">分配至高利活存</th>
+                            <th class="text-end">分配至 0050</th>
+                            <th>備註說明</th>
+                            <th class="text-center">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionTableBody">
+                        <!-- 動態插入流水帳 -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="text-center py-4 text-secondary small d-none" id="emptyTableNotice">
+                <i class="bi bi-inbox fs-3 d-block mb-1 text-muted"></i>
+                尚無存錢紀錄，點擊右上角「入帳打卡」開始您的第一桶金航程！
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="py-3 text-center text-secondary small border-top border-secondary-subtle mt-auto">
+        <div class="container max-w-1200">
+            WEALTH HORIZON &copy; 2026 · 穩健累積第一桶金 ➔ 邁向 1000 萬財富自由 · 離線本機保護
+        </div>
+    </footer>
+
+    <!-- ==================== MODALS 互動視窗 ==================== -->
+
+    <!-- 1. 入帳打卡 Modal -->
+    <div class="modal fade" id="depositModal" tabindex="-1" aria-labelledby="depositModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content glass-modal border-secondary-subtle">
+                <div class="modal-header border-secondary-subtle">
+                    <h5 class="modal-title fw-bold text-white" id="depositModalLabel">
+                        <i class="bi bi-piggy-bank-fill text-gold me-2"></i>入帳打卡推進
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formDeposit">
+                        <!-- 日期選擇 (預設支援從 2/5 開始補登) -->
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small" for="depositDate">存入日期</label>
+                            <input type="date" class="form-control form-control-dark" id="depositDate" required>
+                        </div>
+
+                        <!-- 存入類型 -->
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small">入帳類型</label>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <input type="radio" class="btn-check" name="depositType" id="typeRegular" value="REGULAR" checked>
+                                    <label class="btn btn-outline-light w-100 py-2 small fw-semibold" for="typeRegular">
+                                        每月固定儲蓄
+                                    </label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="radio" class="btn-check" name="depositType" id="typeBonus" value="BONUS">
+                                    <label class="btn btn-outline-light w-100 py-2 small fw-semibold" for="typeBonus">
+                                        獎金 / 額外結餘
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 存入金額 -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <label class="form-label text-secondary small" for="depositAmount">本次存入金額 (NT$)</label>
+                                <span class="text-gold xsmall" id="hintCurrentMonthlySetting">預設：$30,000</span>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary text-secondary">$</span>
+                                <input type="number" class="form-control form-control-dark fs-5 fw-bold text-white" id="depositAmount" min="1" step="any" value="30000" required>
+                            </div>
+                        </div>
+
+                        <!-- 加速補滿活存核取框 (在 BONUS 結餘模式時顯示) -->
+                        <div class="form-check form-switch mb-3 p-2 bg-dark-subtle rounded border border-secondary-subtle" id="containerLumpSumSwitch">
+                            <input class="form-check-input ms-0 me-2" type="checkbox" role="switch" id="switchLumpSum">
+                            <label class="form-check-label small text-light" for="switchLumpSum">
+                                優先加速把高利活存補滿 (若有結餘直接全額填補缺口)
+                            </label>
+                        </div>
+
+                        <!-- 即時預覽分流結果 -->
+                        <div class="p-3 rounded-3 bg-black border border-secondary-subtle mb-3">
+                            <div class="small text-secondary mb-2 fw-semibold">
+                                <i class="bi bi-funnel text-gold me-1"></i>演算法動態分流試算預覽：
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small text-secondary">
+                                    <i class="bi bi-shield-fill text-primary me-1"></i>高利活存分配：
+                                </span>
+                                <span class="fw-bold text-primary" id="previewEmergency">+ NT$ 15,000</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="small text-secondary">
+                                    <i class="bi bi-graph-up text-emerald me-1"></i>0050 ETF 溢流分配：
+                                </span>
+                                <span class="fw-bold text-emerald" id="previewEtf">+ NT$ 15,000</span>
+                            </div>
+                            <div class="xsmall text-muted border-top border-secondary-subtle pt-1" id="previewNote">
+                                活存尚未滿 120,000，按規則分流。
+                            </div>
+                        </div>
+
+                        <!-- 備註 -->
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small" for="depositNote">備註 (選填)</label>
+                            <input type="text" class="form-control form-control-dark" id="depositNote" placeholder="例：2月薪水定期存入、年終獎金結餘">
+                        </div>
+
+                        <button type="submit" class="btn btn-gold w-100 py-2 fw-bold shadow-gold rounded-pill" id="btnSubmitDeposit">
+                            <i class="bi bi-check2-circle me-1"></i>確認存入並推進進度
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 市值/配息校準 Modal -->
+    <div class="modal fade" id="recalibrateModal" tabindex="-1" aria-labelledby="recalibrateModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-modal border-secondary-subtle">
+                <div class="modal-header border-secondary-subtle">
+                    <h5 class="modal-title fw-bold text-white" id="recalibrateModalLabel">
+                        <i class="bi bi-sliders text-info me-2"></i>市值校準與配息再投入
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- 分頁切換 -->
+                    <ul class="nav nav-pills nav-fill mb-3 p-1 bg-dark-subtle rounded-pill" id="pills-tab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active rounded-pill py-1 small" id="tab-revalue-tab" data-bs-toggle="pill" data-bs-target="#tab-revalue" type="button" role="tab">0050 市值現值校正</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link rounded-pill py-1 small" id="tab-dividend-tab" data-bs-toggle="pill" data-bs-target="#tab-dividend" type="button" role="tab">股息再投入</button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="pills-tabContent">
+                        <!-- 市值校正 -->
+                        <div class="tab-pane fade show active" id="tab-revalue" role="tabpanel">
+                            <form id="formRevalue">
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between text-secondary small">
+                                        <span>當前 0050 累計投入本金：</span>
+                                        <span class="text-light fw-bold" id="labelCurrentEtfPrincipal">NT$ 0</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between text-secondary small mt-1">
+                                        <span>當前系統記錄市值：</span>
+                                        <span class="text-emerald fw-bold" id="labelCurrentEtfMarketVal">NT$ 0</span>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-secondary small" for="inputActualMarketVal">券商 APP 顯示的真實 0050 總現值 (NT$)</label>
+                                    <input type="number" class="form-control form-control-dark fs-5 fw-bold text-emerald" id="inputActualMarketVal" min="0" step="any" required>
+                                    <div class="form-text text-secondary xsmall">輸入券商庫存現值，系統將自動計算未實現損益與最新總資產。</div>
+                                </div>
+                                <button type="submit" class="btn btn-info text-dark fw-bold w-100 py-2 rounded-pill">
+                                    更新 0050 真實市值
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- 股息再投入 -->
+                        <div class="tab-pane fade" id="tab-dividend" role="tabpanel">
+                            <form id="formDividend">
+                                <div class="mb-3">
+                                    <label class="form-label text-secondary small" for="inputDividendAmt">本次領到 0050 現金股利 (NT$)</label>
+                                    <input type="number" class="form-control form-control-dark fs-5 fw-bold text-gold" id="inputDividendAmt" min="0" step="any" placeholder="例：3500" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-secondary small" for="dividendAction">股息處理去向</label>
+                                    <select class="form-select form-select-dark" id="dividendAction">
+                                        <option value="REINVEST_0050" selected>自動滾入 0050 再買進 (發動複利)</option>
+                                        <option value="TO_EMERGENCY">轉入高利活存補充應急金</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-gold fw-bold w-100 py-2 rounded-pill">
+                                    記錄股息並推進複利
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 策略參數設定 Modal (支援調薪、活存上限調整) -->
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-modal border-secondary-subtle">
+                <div class="modal-header border-secondary-subtle">
+                    <h5 class="modal-title fw-bold text-white" id="settingsModalLabel">
+                        <i class="bi bi-gear-fill text-gold me-2"></i>策略與調薪設定中心
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formSettings">
+                        <!-- 調薪/每月固定存入金額 -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <label class="form-label text-secondary small mb-1" for="settingMonthlyDeposit">
+                                    <i class="bi bi-cash-coin text-gold me-1"></i>每月預設存入本金 (NT$)
+                                </label>
+                                <span class="badge bg-gold-subtle text-gold xsmall">未來調薪直接改此處</span>
+                            </div>
+                            <input type="number" class="form-control form-control-dark fs-5 fw-bold text-gold" id="settingMonthlyDeposit" step="1000" min="1000" value="30000" required>
+                            <div class="form-text text-secondary xsmall">
+                                修改後，過去歷史帳本完全不受影響；未來的 100 萬/1000 萬達成預測日將立刻以新金額重新計算。
+                            </div>
+                        </div>
+
+                        <!-- 高利活存目標上限 -->
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small mb-1" for="settingEmergencyCap">
+                                <i class="bi bi-shield-check text-primary me-1"></i>高利活存滿額門檻 (NT$)
+                            </label>
+                            <input type="number" class="form-control form-control-dark" id="settingEmergencyCap" step="10000" min="10000" value="120000" required>
+                            <div class="form-text text-secondary xsmall">
+                                預設為 120,000 元（滿額後多存的錢全數 100% 溢流至 0050）。
+                            </div>
+                        </div>
+
+                        <!-- 高利活存每月上限 -->
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small mb-1" for="settingMonthlyEmergencyRate">
+                                <i class="bi bi-funnel text-primary me-1"></i>高利活存每月撥款上限 (NT$)
+                            </label>
+                            <input type="number" class="form-control form-control-dark" id="settingMonthlyEmergencyRate" step="1000" min="1000" value="15000" required>
+                            <div class="form-text text-secondary xsmall">
+                                活存未滿時，每月最多注入此額度（預設 15,000，其餘進 0050）。
+                            </div>
+                        </div>
+
+                        <!-- 0050 預期年化報酬率 -->
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small mb-1" for="settingEtfAnnualRate">
+                                <i class="bi bi-graph-up-arrow text-emerald me-1"></i>0050 預估年化報酬率 (%)
+                            </label>
+                            <input type="number" class="form-control form-control-dark" id="settingEtfAnnualRate" step="0.1" min="1" max="25" value="7.0" required>
+                            <div class="form-text text-secondary xsmall">
+                                用於長期沙盤推演與達成日期估算（歷史長期平均約 7%~9%）。
+                            </div>
+                        </div>
+
+                        <!-- 重設所有資料 (危險操作) -->
+                        <div class="pt-3 border-top border-secondary-subtle d-flex justify-content-between align-items-center">
+                            <button type="button" class="btn btn-outline-danger btn-sm" id="btnResetAllData">
+                                <i class="bi bi-trash3 me-1"></i>重置所有資料
+                            </button>
+                            <button type="submit" class="btn btn-gold fw-bold px-4 rounded-pill">
+                                儲存策略設定
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5.2.3 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Application Logic -->
+    <script src="js/app.js"></script>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then((reg) => console.log('PWA ServiceWorker registered successfully:', reg.scope))
+                    .catch((err) => console.warn('PWA ServiceWorker registration failed:', err));
+            });
+        }
+    </script>
+</body>
+</html>

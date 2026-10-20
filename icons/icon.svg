@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0e17"/>
+      <stop offset="50%" stop-color="#121826"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="50%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="flameGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#ef4444"/>
+    </linearGradient>
+    <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- 背景圓角方形 -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)"/>
+  <rect width="504" height="504" x="4" y="4" rx="124" fill="none" stroke="#f59e0b" stroke-width="6" opacity="0.4"/>
+
+  <!-- 火箭噴射尾焰 -->
+  <path d="M 230 330 C 210 390, 240 450, 256 460 C 272 450, 302 390, 282 330 Z" fill="url(#flameGrad)" opacity="0.9"/>
+  <path d="M 242 330 C 235 370, 250 410, 256 420 C 262 410, 277 370, 270 330 Z" fill="#ffffff" opacity="0.8"/>
+
+  <!-- 機翼 -->
+  <path d="M 170 300 L 220 250 L 220 320 L 150 350 Z" fill="#10b981"/>
+  <path d="M 342 300 L 292 250 L 292 320 L 362 350 Z" fill="#10b981"/>
+
+  <!-- 火箭主體 -->
+  <path d="M 256 70 C 200 160, 210 280, 220 330 L 292 330 C 302 280, 312 160, 256 70 Z" fill="url(#goldGrad)" filter="url(#goldGlow)"/>
+
+  <!-- 駕駛艙舷窗 -->
+  <circle cx="256" cy="190" r="28" fill="#0a0e17" stroke="#ffffff" stroke-width="4"/>
+  <circle cx="256" cy="190" r="20" fill="#38bdf8" opacity="0.8"/>
+
+  <!-- 科技光芒小裝飾 -->
+  <circle cx="120" cy="140" r="6" fill="#fbbf24" opacity="0.8"/>
+  <circle cx="390" cy="180" r="8" fill="#34d399" opacity="0.8"/>
+  <circle cx="370" cy="380" r="5" fill="#ffffff" opacity="0.6"/>
+</svg>

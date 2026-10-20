@@ -1,0 +1,424 @@
+/* ========================================================
+   WEALTH HORIZON - Premium FinTech Glassmorphism Design
+   Aesthetics: Deep Cyber-Slate, Gold Accents, Liquid Waves
+   ======================================================== */
+
+:root {
+    --bg-main: #0a0e17;
+    --bg-card: rgba(18, 24, 38, 0.75);
+    --bg-card-hover: rgba(25, 34, 54, 0.85);
+    --border-glass: rgba(255, 255, 255, 0.08);
+    --border-glass-gold: rgba(234, 179, 8, 0.35);
+
+    --color-gold: #f59e0b;
+    --color-gold-light: #fbbf24;
+    --color-gold-glow: rgba(245, 158, 11, 0.25);
+
+    --color-emerald: #10b981;
+    --color-emerald-light: #34d399;
+    --color-emerald-glow: rgba(16, 185, 129, 0.25);
+
+    --color-blue: #3b82f6;
+    --color-blue-light: #60a5fa;
+
+    --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    background-color: var(--bg-main);
+    background-image: 
+        radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 30%, rgba(245, 158, 11, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 50% 85%, rgba(16, 185, 129, 0.06) 0%, transparent 50%);
+    background-attachment: fixed;
+    color: #e2e8f0;
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6, .brand-title, .stat-value, .liquid-percent, .goal-toggle-btn {
+    font-family: var(--font-heading);
+}
+
+.max-w-1200 {
+    max-width: 1200px;
+}
+
+/* Glassmorphism Navigation */
+.glass-nav {
+    background: rgba(10, 14, 23, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 1020;
+}
+
+.brand-icon-wrapper {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(16, 185, 129, 0.1));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-glass-gold);
+}
+
+.brand-title {
+    letter-spacing: 1.5px;
+    font-size: 0.95rem;
+}
+
+.xsmall-badge {
+    font-size: 0.68rem;
+    padding: 2px 6px;
+}
+
+.xsmall {
+    font-size: 0.75rem;
+}
+
+/* Colors & Accents */
+.text-gold {
+    color: var(--color-gold-light) !important;
+}
+
+.text-emerald {
+    color: var(--color-emerald-light) !important;
+}
+
+.bg-gold {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #000;
+}
+
+.bg-gold-subtle {
+    background-color: rgba(245, 158, 11, 0.15) !important;
+}
+
+.bg-emerald-subtle {
+    background-color: rgba(16, 185, 129, 0.15) !important;
+}
+
+.shadow-gold {
+    box-shadow: 0 4px 16px var(--color-gold-glow);
+}
+
+.btn-gold {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #000;
+    border: none;
+    transition: all 0.25s ease;
+}
+
+.btn-gold:hover {
+    background: linear-gradient(135deg, #fcd34d, #fbbf24);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.45);
+    color: #000;
+    transform: translateY(-1px);
+}
+
+.btn-outline-gold {
+    color: var(--color-gold-light);
+    border: 1px solid var(--color-gold);
+    background: transparent;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-gold:hover {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fff;
+    border-color: var(--color-gold-light);
+}
+
+/* Cards & Glass Containers */
+.glass-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-glass) !important;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.glass-card:hover {
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.card-glow-bg {
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 220px;
+    height: 220px;
+    background: radial-gradient(circle, var(--color-gold-glow) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Toggle Buttons */
+.btn-check:checked + .goal-toggle-btn {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b) !important;
+    color: #000 !important;
+    font-weight: 700 !important;
+    box-shadow: 0 2px 8px var(--color-gold-glow);
+}
+
+.goal-toggle-btn {
+    color: #94a3b8;
+    border: none;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+}
+
+/* Progress Bars */
+.progress-glass {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.bg-gradient-gold {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24, #10b981) !important;
+}
+
+/* Stat Box */
+.stat-box {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    margin-bottom: 2px;
+}
+
+.stat-value {
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+/* Reservoir (Liquid Water Tank) Design */
+.reservoir-card {
+    min-height: 260px;
+}
+
+.reservoir-badge {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.reservoir-liquid-wrapper {
+    position: relative;
+    width: 100%;
+    height: 125px;
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 14px;
+    border: 1px solid var(--border-glass);
+    overflow: hidden;
+    box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.liquid-box {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.liquid-wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 0%;
+    transition: height 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Blue Wave for Emergency Fund */
+.liquid-blue .liquid-wave {
+    background: linear-gradient(180deg, rgba(96, 165, 250, 0.7) 0%, rgba(37, 99, 235, 0.85) 100%);
+    box-shadow: 0 -4px 16px rgba(59, 130, 246, 0.4);
+}
+
+.liquid-blue.full-tank .liquid-wave {
+    background: linear-gradient(180deg, rgba(251, 191, 36, 0.8) 0%, rgba(217, 119, 6, 0.9) 100%);
+    box-shadow: 0 -4px 20px rgba(245, 158, 11, 0.6);
+}
+
+/* Emerald Wave for 0050 ETF */
+.liquid-emerald .liquid-wave {
+    background: linear-gradient(180deg, rgba(52, 211, 153, 0.7) 0%, rgba(5, 150, 105, 0.85) 100%);
+    box-shadow: 0 -4px 16px rgba(16, 185, 129, 0.4);
+}
+
+.liquid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* Milestones Road Track */
+.milestones-track-wrapper {
+    overflow-x: auto;
+    padding: 10px 0 20px 0;
+}
+
+.milestones-track {
+    display: flex;
+    align-items: center;
+    position: relative;
+    min-width: 680px;
+    padding: 20px 10px;
+}
+
+.milestones-track::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 40px;
+    right: 40px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-50%);
+    z-index: 1;
+}
+
+.milestones-track-progress {
+    position: absolute;
+    top: 50%;
+    left: 40px;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6, #f59e0b, #10b981);
+    transform: translateY(-50%);
+    z-index: 2;
+    transition: width 0.8s ease;
+}
+
+.milestone-node {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    text-align: center;
+}
+
+.milestone-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #1e293b;
+    border: 3px solid #475569;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    color: #94a3b8;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.milestone-node.unlocked .milestone-icon {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    border-color: #fff;
+    color: #000;
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
+    transform: scale(1.1);
+}
+
+.milestone-node.current .milestone-icon {
+    border-color: #38bdf8;
+    background: #0284c7;
+    color: #fff;
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.8);
+    animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7); }
+    70% { box-shadow: 0 0 0 12px rgba(56, 189, 248, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+}
+
+.milestone-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #cbd5e1;
+}
+
+.milestone-target {
+    font-size: 0.72rem;
+    color: #94a3b8;
+}
+
+/* Modals */
+.glass-modal {
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 18px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+}
+
+.form-control-dark, .form-select-dark {
+    background-color: rgba(2, 6, 23, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #f8fafc !important;
+    border-radius: 10px;
+}
+
+.form-control-dark:focus, .form-select-dark:focus {
+    border-color: var(--color-gold) !important;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25) !important;
+}
+
+/* Custom Table */
+.custom-table {
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.custom-table th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    letter-spacing: 0.5px;
+    background-color: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.custom-table td {
+    font-size: 0.82rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 576px) {
+    .brand-title {
+        font-size: 0.85rem;
+    }
+    .display-4 {
+        font-size: 2.2rem;
+    }
+    .display-5 {
+        font-size: 1.8rem;
+    }
+    .reservoir-liquid-wrapper {
+        height: 105px;
+    }
+}
