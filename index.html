@@ -105,7 +105,7 @@
                         </div>
                         <div class="col-6 col-sm-4">
                             <div class="stat-box">
-                                <span class="stat-label">0050 未實現損益</span>
+                                <span class="stat-label">投資組合未實現損益</span>
                                 <span class="stat-value text-success" id="statUnrealizedProfit">NT$ 0</span>
                             </div>
                         </div>
@@ -212,18 +212,18 @@
                     </div>
                 </div>
 
-                <!-- 水庫 B：0050 ETF（進攻池） -->
+                <!-- 水庫 B：核心資產進攻組合 -->
                 <div class="col-12 col-md-6">
                     <div class="card glass-card p-4 border-0 reservoir-card position-relative overflow-hidden" id="cardEtfPool">
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <div>
                                 <div class="d-flex align-items-center gap-2">
                                     <div class="reservoir-badge bg-emerald-subtle text-emerald">
-                                        <i class="bi bi-graph-up-arrow"></i>
+                                        <i class="bi bi-pie-chart-fill"></i>
                                     </div>
                                     <div>
-                                        <h3 class="h6 fw-bold mb-0 text-white">0050 ETF 進攻成長池</h3>
-                                        <span class="text-secondary xsmall">資產爆發滾存 / 複利增長核心引擎</span>
+                                        <h3 class="h6 fw-bold mb-0 text-white" id="titlePortfolioCard">核心資產進攻組合</h3>
+                                        <span class="text-secondary xsmall" id="subtitlePortfolioCard">0050 / 美股 / 債券等多標的動態配置</span>
                                     </div>
                                 </div>
                             </div>
@@ -238,14 +238,25 @@
                                 <div class="liquid-wave" id="waveEtf" style="height: 0%;"></div>
                                 <div class="liquid-overlay d-flex flex-column align-items-center justify-content-center">
                                     <div class="liquid-percent fw-extrabold display-6 text-white" id="textEtfPercent">0%</div>
-                                    <div class="liquid-amt small text-white-50" id="textEtfCurrent">市值 NT$ 0</div>
+                                    <div class="liquid-amt small text-white-50" id="textEtfCurrent">組合市值 NT$ 0</div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top border-secondary-subtle small">
-                            <span class="text-secondary">累積本金：<span class="text-light fw-semibold" id="textEtfPrincipal">NT$ 0</span></span>
-                            <span class="text-emerald" id="textEtfRatePreview">預期年化 7.0%</span>
+                        <!-- 多標的資產配比明細清單 (動態注入) -->
+                        <div class="mt-2 pt-2 border-top border-secondary-subtle">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="xsmall text-secondary fw-semibold">當前組合各標的配比與現值</span>
+                                <span class="xsmall text-emerald fw-semibold" id="textEtfRatePreview">加權年化 7.0%</span>
+                            </div>
+                            <div id="portfolioAssetsListContainer" class="d-flex flex-column gap-1">
+                                <!-- 動態渲染各標的比例長條與金額 -->
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top border-secondary-subtle small">
+                            <span class="text-secondary">累積總本金：<span class="text-light fw-semibold" id="textEtfPrincipal">NT$ 0</span></span>
+                            <span class="text-secondary">配置標的：<span class="text-gold fw-semibold" id="textAssetCount">1 檔</span></span>
                         </div>
                     </div>
                 </div>
@@ -464,13 +475,17 @@
                                 </span>
                                 <span class="fw-bold text-primary" id="previewEmergency">+ NT$ 15,000</span>
                             </div>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
                                 <span class="small text-secondary">
-                                    <i class="bi bi-graph-up text-emerald me-1"></i>0050 ETF 溢流分配：
+                                    <i class="bi bi-pie-chart-fill text-emerald me-1"></i>進攻組合溢流總額：
                                 </span>
                                 <span class="fw-bold text-emerald" id="previewEtf">+ NT$ 15,000</span>
                             </div>
-                            <div class="xsmall text-muted border-top border-secondary-subtle pt-1" id="previewNote">
+                            <!-- 多標的切分清單 (動態注入) -->
+                            <div id="previewPortfolioBreakdown" class="ps-3 pe-2 py-1 my-1 rounded bg-dark-subtle border border-secondary-subtle xsmall d-none">
+                                <!-- 動態渲染各標的分配額 -->
+                            </div>
+                            <div class="xsmall text-muted border-top border-secondary-subtle pt-1 mt-2" id="previewNote">
                                 活存尚未滿 120,000，按規則分流。
                             </div>
                         </div>
@@ -504,10 +519,10 @@
                     <!-- 分頁切換 -->
                     <ul class="nav nav-pills nav-fill mb-3 p-1 bg-dark-subtle rounded-pill" id="pills-tab" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active rounded-pill py-1 small" id="tab-revalue-tab" data-bs-toggle="pill" data-bs-target="#tab-revalue" type="button" role="tab">0050 市值現值校正</button>
+                            <button class="nav-link active rounded-pill py-1 small" id="tab-revalue-tab" data-bs-toggle="pill" data-bs-target="#tab-revalue" type="button" role="tab">標的市值現值校正</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link rounded-pill py-1 small" id="tab-dividend-tab" data-bs-toggle="pill" data-bs-target="#tab-dividend" type="button" role="tab">股息再投入</button>
+                            <button class="nav-link rounded-pill py-1 small" id="tab-dividend-tab" data-bs-toggle="pill" data-bs-target="#tab-dividend" type="button" role="tab">標的股息再投入</button>
                         </li>
                     </ul>
 
@@ -515,23 +530,30 @@
                         <!-- 市值校正 -->
                         <div class="tab-pane fade show active" id="tab-revalue" role="tabpanel">
                             <form id="formRevalue">
+                                <!-- 選擇標的 -->
                                 <div class="mb-3">
+                                    <label class="form-label text-secondary small" for="selectRevalueAsset">選擇要校正的投資標的</label>
+                                    <select class="form-select form-select-dark" id="selectRevalueAsset">
+                                        <!-- 動態注入標的選項 -->
+                                    </select>
+                                </div>
+                                <div class="mb-3 p-2 rounded bg-black border border-secondary-subtle">
                                     <div class="d-flex justify-content-between text-secondary small">
-                                        <span>當前 0050 累計投入本金：</span>
+                                        <span>該標的累計投入本金：</span>
                                         <span class="text-light fw-bold" id="labelCurrentEtfPrincipal">NT$ 0</span>
                                     </div>
                                     <div class="d-flex justify-content-between text-secondary small mt-1">
-                                        <span>當前系統記錄市值：</span>
+                                        <span>該標的當前系統記錄市值：</span>
                                         <span class="text-emerald fw-bold" id="labelCurrentEtfMarketVal">NT$ 0</span>
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label text-secondary small" for="inputActualMarketVal">券商 APP 顯示的真實 0050 總現值 (NT$)</label>
+                                    <label class="form-label text-secondary small" for="inputActualMarketVal">券商 APP 顯示的真實總現值 (NT$)</label>
                                     <input type="number" class="form-control form-control-dark fs-5 fw-bold text-emerald" id="inputActualMarketVal" min="0" step="any" required>
-                                    <div class="form-text text-secondary xsmall">輸入券商庫存現值，系統將自動計算未實現損益與最新總資產。</div>
+                                    <div class="form-text text-secondary xsmall">輸入最新庫存現值，系統將自動計算該標的損益並校準總淨值。</div>
                                 </div>
                                 <button type="submit" class="btn btn-info text-dark fw-bold w-100 py-2 rounded-pill">
-                                    更新 0050 真實市值
+                                    更新標的真實市值
                                 </button>
                             </form>
                         </div>
@@ -539,14 +561,21 @@
                         <!-- 股息再投入 -->
                         <div class="tab-pane fade" id="tab-dividend" role="tabpanel">
                             <form id="formDividend">
+                                <!-- 選擇標的 -->
                                 <div class="mb-3">
-                                    <label class="form-label text-secondary small" for="inputDividendAmt">本次領到 0050 現金股利 (NT$)</label>
+                                    <label class="form-label text-secondary small" for="selectDividendAsset">發放現金股利的標的</label>
+                                    <select class="form-select form-select-dark" id="selectDividendAsset">
+                                        <!-- 動態注入標的選項 -->
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-secondary small" for="inputDividendAmt">本次領到現金股利 (NT$)</label>
                                     <input type="number" class="form-control form-control-dark fs-5 fw-bold text-gold" id="inputDividendAmt" min="0" step="any" placeholder="例：3500" required>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label text-secondary small" for="dividendAction">股息處理去向</label>
                                     <select class="form-select form-select-dark" id="dividendAction">
-                                        <option value="REINVEST_0050" selected>自動滾入 0050 再買進 (發動複利)</option>
+                                        <option value="REINVEST_ASSET" selected>自動滾入該標的再買進 (發動複利)</option>
                                         <option value="TO_EMERGENCY">轉入高利活存補充應急金</option>
                                     </select>
                                 </div>
@@ -609,14 +638,31 @@
                             </div>
                         </div>
 
-                        <!-- 0050 預期年化報酬率 -->
-                        <div class="mb-3">
-                            <label class="form-label text-secondary small mb-1" for="settingEtfAnnualRate">
-                                <i class="bi bi-graph-up-arrow text-emerald me-1"></i>0050 預估年化報酬率 (%)
-                            </label>
-                            <input type="number" class="form-control form-control-dark" id="settingEtfAnnualRate" step="0.1" min="1" max="25" value="7.0" required>
-                            <div class="form-text text-secondary xsmall">
-                                用於長期沙盤推演與達成日期估算（歷史長期平均約 7%~9%）。
+                        <!-- 進攻投資組合多標的配置 -->
+                        <div class="mb-3 p-3 rounded-3 bg-black border border-secondary-subtle">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label text-white small fw-bold mb-0">
+                                    <i class="bi bi-pie-chart-fill text-gold me-1"></i>進攻組合配置 (多標的分流)
+                                </label>
+                                <button type="button" class="btn btn-outline-gold btn-sm py-0 px-2 xsmall rounded-pill" id="btnAddPortfolioAsset">
+                                    <i class="bi bi-plus-lg me-1"></i>新增標的
+                                </button>
+                            </div>
+                            <div class="xsmall text-secondary mb-2">
+                                可配置多檔標的（如 0050、美股 VOO、高股息等）。資金溢流時按配比自動切分，各標的配比總和必須為 100%。
+                            </div>
+                            
+                            <!-- 動態標的列表容器 -->
+                            <div id="settingsPortfolioList" class="d-flex flex-column gap-2 mb-2">
+                                <!-- 動態渲染各標的編輯列 -->
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top border-secondary-subtle xsmall">
+                                <span>總配比合計：<span id="textTotalRatioCheck" class="fw-bold text-success">100%</span></span>
+                                <span>加權平均年化：<span id="textWeightedRatePreview" class="fw-bold text-gold">7.0%</span></span>
+                            </div>
+                            <div id="alertRatioError" class="xsmall text-danger mt-1 d-none">
+                                ⚠️ 各標的配比加總必須剛好等於 100% 才能儲存！
                             </div>
                         </div>
 

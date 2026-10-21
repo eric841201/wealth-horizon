@@ -3,7 +3,7 @@
  * 絕對 URL 精確匹配，完全隔離 iOS 飛航模式的網絡報錯
  */
 
-const CACHE_NAME = 'wealth-horizon-v5';
+const CACHE_NAME = 'wealth-horizon-v6';
 
 const ASSET_FILES = [
     '',
